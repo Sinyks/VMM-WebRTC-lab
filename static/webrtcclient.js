@@ -322,8 +322,8 @@ function hangUp() {
   var remoteVideo = document.getElementById('remoteVideo')
 
   // *** TODO ***: remove the tracks from localVideo and remoteVideo
-  localVideo.getTracks().forEach(track => track.stop());
-  remoteVideo.getTracks().forEach(track => track.stop());
+  localVideo.srcObject.getTracks().forEach(track => track.stop());
+  remoteVideo.srcObject.getTracks().forEach(track => track.stop());
   
   // *** TODO ***: set localVideo and remoteVideo source objects to null
   localVideo = null;
