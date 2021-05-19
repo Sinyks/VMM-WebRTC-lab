@@ -45,12 +45,13 @@ async function enable_camera() {
 
   // *** TODO ***: use getUserMedia to get a local media stream from the camera.
   //               If this fails, use getDisplayMedia to get a screen sharing stream.
+  let stream;
   try {
-    var stream = await navigator.mediaDevices.getUserMedia(constraints);
+    stream = await navigator.mediaDevices.getUserMedia(constraints);
     console.log('Got MediaStream:', stream);
   } catch (error) {
     console.error('Error accessing media devices.', error);
-    var stream = await navigator.mediaDevices.getDisplayMedia(constraints);
+    stream = await navigator.mediaDevices.getDisplayMedia(constraints);
   }
 
   document.getElementById('localVideo').srcObject = stream;
@@ -231,7 +232,7 @@ async function handle_local_icecandidate(event) {
 async function handle_remote_icecandidate(candidate) {
   console.log('Received remote ICE candidate: ', candidate);
   // *** TODO ***: add the received remote ICE candidate to the peerConnection
-  peerConnection.addIceCandidate(candidate); 
+  await peerConnection.addIceCandidate(candidate); 
 
 }
 
@@ -245,7 +246,7 @@ async function handle_remote_icecandidate(candidate) {
 function handle_remote_track(event) {
   console.log('Received remote track: ', event);
   // *** TODO ***: get the first stream of the event and show it in remoteVideo
-  //document.getElementById('remoteVideo').srcObject = ...
+  document.getElementById('remoteVideo').srcObject = event.streams[0];
 }
 
 // ==========================================================================
@@ -258,10 +259,11 @@ function create_datachannel(peerConnection) {
   console.log('Creating dataChannel. I am the Caller.');
 
   // *** TODO ***: create a dataChannel on the peerConnection
-  //dataChannel = ...
+  dataChannel = peerConnection.createDataChannel('chat');
 
   // *** TODO ***: connect the handlers onopen and onmessage to the handlers below
-  //dataChannel. ...
+  dataChannel.onopen = handle_datachannel_open;
+  dataChannel.onmessage = handle_datachannel_message;
 
 }
 
@@ -271,8 +273,10 @@ function handle_remote_datachannel(event) {
   console.log('Received remote dataChannel. I am Callee.');
 
   // *** TODO ***: get the data channel from the event
-
+  dataChannel = event.channel;
   // *** TODO ***: add event handlers for onopen and onmessage events to the dataChannel
+  dataChannel.onopen = handle_datachannel_open;
+  dataChannel.onmessage = handle_datachannel_message;
 
 }
 
@@ -291,6 +295,7 @@ function sendMessage() {
   document.getElementById('dataChannelOutput').value += '        ME: ' + message + '\n';
 
   // *** TODO ***: send the message through the dataChannel
+  dataChannel.send(message);
 
 }
 
@@ -307,19 +312,30 @@ function handle_datachannel_message(event) {
 // HangUp: Send a bye message to peer and close all connections and streams.
 function hangUp() {
   // *** TODO ***: Write a console log
+  console.log("Terminating the connection");
 
   // *** TODO ***: send a bye message with the room name to the server
+  socket.emit('bye',room)
 
   // Switch off the local stream by stopping all tracks of the local stream
   var localVideo = document.getElementById('localVideo')
   var remoteVideo = document.getElementById('remoteVideo')
-  // *** TODO ***: remove the tracks from localVideo and remoteVideo
 
+  // *** TODO ***: remove the tracks from localVideo and remoteVideo
+  localVideo.getTracks().forEach(track => track.stop());
+  remoteVideo.getTracks().forEach(track => track.stop());
+  
   // *** TODO ***: set localVideo and remoteVideo source objects to null
+  localVideo = null;
+  remoteVideo = null;
 
   // *** TODO ***: close the peerConnection and set it to null
-
+  peerConnection.close();
+  peerConnection = null;
+  
   // *** TODO ***: close the dataChannel and set it to null
+  dataChannel.close();
+  dataChannel = null;
 
   document.getElementById('dataChannelOutput').value += '*** Channel is closed ***\n';
 }
