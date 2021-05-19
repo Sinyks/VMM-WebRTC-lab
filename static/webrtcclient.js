@@ -206,7 +206,7 @@ async function handle_ok(answer) {
   console.log('Received OK answer from Callee: ', answer);
   // *** TODO ***: use setRemoteDescription (with await) to add the answer SDP 
   //               the peerConnection
-  
+
   peerConnection.setRemoteDescription(answer);
 }
 
@@ -221,13 +221,17 @@ async function handle_local_icecandidate(event) {
   console.log('Received local ICE candidate: ', event);
   // *** TODO ***: check if there is a new ICE candidate.
   // *** TODO ***: if yes, send a 'ice_candidate' message with the candidate to the peer
+  if (event.candidate) {
+    socket.emit('ice_candidate',event.candidate);
+  }
 }
 
 // --------------------------------------------------------------------------
 // The peer has sent a remote ICE candidate. Add it to the PeerConnection.
 async function handle_remote_icecandidate(candidate) {
   console.log('Received remote ICE candidate: ', candidate);
-  // *** TODO ***: add the received remote ICE candidate to the peerConnection 
+  // *** TODO ***: add the received remote ICE candidate to the peerConnection
+  peerConnection.addIceCandidate(candidate); 
 
 }
 
