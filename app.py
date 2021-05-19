@@ -40,18 +40,18 @@ def handle_join(room_name):
     if members == 0:
         print(f'Received join from user: {user_id} for NEW room: {room_name}.')
         # *** TODO ***: Add the user_id to the rooms_db dictionary with the room_name as value
-        room_db[user_id] = room_name
+        rooms_db[user_id] = room_name
         # *** TODO ***: Use the SocketIO function join_room to add the user to a SocketIO room.
-        join_room(room)
+        join_room(room_name)
         # *** TODO ***: Use the SocketIO emit function to send a 'created' message back with the room_name as argument
         emit(f'created',room_name)
 
     elif members == 1:
         print(f'Received join from user: {user_id} for EXISTING room: {room_name}.')
         # *** TODO ***: Add the user_id to rooms_db with room_name as value.
-        room_db[user_id] = room_name
+        rooms_db[user_id] = room_name
         # *** TODO ***: Use join_room to add the user to a SocketIO room.
-        join_room(room)
+        join_room(room_name)
         # *** TODO ***: Emit a 'joined' message back to the client, with the room_name as data.
         emit(f'joined',room_name)
         # *** TODO ***: Broadcast to existing client that there is a new peer
@@ -65,7 +65,7 @@ def handle_p2pmessage(msg_type, content):
     # *** TODO ***: Get the user_id from the request variable (see handle_join)
     user_id = request.sid
     # *** TODO ***: Get the room_name of the user from rooms_db
-    room_name = room_db[user_id]
+    room_name = rooms_db[user_id]
 
     print(f"Received {msg_type} message: {content} from user: {user_id} in room {room_name}")
 
@@ -93,7 +93,7 @@ def handle_bye(room_name):
     # *** TODO ***: Get the user_id from the request variable 
     user_id = request.sid
     # *** TODO ***: Use leave_room to remove the sender from the SocketIO room
-    leave_room(room_db[user_id])
+    leave_room(rooms_db[user_id])
     # *** TODO ***: Remove the user from rooms_db
     my_dict.pop(user_id, None)
     # *** TODO ***: Forward the 'bye' message using p2p_message
