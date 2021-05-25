@@ -44,7 +44,7 @@ def handle_join(room_name):
         # *** TODO ***: Use the SocketIO function join_room to add the user to a SocketIO room.
         join_room(room_name)
         # *** TODO ***: Use the SocketIO emit function to send a 'created' message back with the room_name as argument
-        emit(f'created',room_name)
+        emit('created',room_name)
 
     elif members == 1:
         print(f'Received join from user: {user_id} for EXISTING room: {room_name}.')
@@ -53,9 +53,9 @@ def handle_join(room_name):
         # *** TODO ***: Use join_room to add the user to a SocketIO room.
         join_room(room_name)
         # *** TODO ***: Emit a 'joined' message back to the client, with the room_name as data.
-        emit(f'joined',room_name)
+        emit('joined',room_name)
         # *** TODO ***: Broadcast to existing client that there is a new peer
-        emit(f'new_peer',room=room_name ,broadcast=True, include_self=False)
+        emit('new_peer',room=room_name ,broadcast=True, include_self=False)
     else:
         print(f'Refusing join from user: {user_id} for FULL room: {room_name}.')
         # *** TODO ***: Emit a 'full' message back to the client, with the room_name as data.
@@ -80,12 +80,12 @@ def handle_invite(content):
 
 # *** TODO ***: Create a message handler for 'ok' messages 
 @socketio.on('ok')
-def handle_invite(content):
+def handle_ok(content):
     handle_p2pmessage('ok', content)
 
 # *** TODO ***: Create a message handler for 'ice_candidate' messages 
 @socketio.on('ice_candidate')
-def handle_invite(content):
+def handle_ice_candidate(content):
     handle_p2pmessage('ice_candidate', content)
 
 @socketio.on('bye')
@@ -95,7 +95,7 @@ def handle_bye(room_name):
     # *** TODO ***: Use leave_room to remove the sender from the SocketIO room
     leave_room(rooms_db[user_id])
     # *** TODO ***: Remove the user from rooms_db
-    my_dict.pop(user_id, None)
+    rooms_db.pop(user_id, None)
     # *** TODO ***: Forward the 'bye' message using p2p_message
     handle_p2pmessage('bye',room_name)
     pass

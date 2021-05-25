@@ -110,6 +110,7 @@ function add_signaling_handlers(socket) {
   });
   // ice_candidate --> handle_remote_icecandidate
   socket.on('ice_canditate',(candidate) => {
+    console.log("send remote ice candidate");
     handle_remote_icecandidate(candidate);
   });
   // bye --> hangUp
@@ -178,7 +179,7 @@ async function handle_new_peer(room){
   create_datachannel(peerConnection); // MUST BE CALLED BEFORE createOffer
 
   // *** TODO ***: use createOffer (with await) generate an SDP offer for peerConnection
-  const offer = await peerConnection.createOffer();
+  var offer = await peerConnection.createOffer();
   // *** TODO ***: use setLocalDescription (with await) to add the offer to peerConnection
   await peerConnection.setLocalDescription(offer);
   // *** TODO ***: send an 'invite' message with the offer to the peer.
@@ -193,7 +194,7 @@ async function handle_invite(offer) {
   // *** TODO ***: use setRemoteDescription (with await) to add the offer SDP to peerConnection
   await peerConnection.setRemoteDescription(offer);
   // *** TODO ***: use createAnswer (with await) to generate an answer SDP
-  const answer = await peerConnection.createAnswer();
+  var answer = await peerConnection.createAnswer();
   // *** TODO ***: use setLocalDescription (with await) to add the answer SDP to peerConnection
   await peerConnection.setLocalDescription(answer);
   // *** TODO ***: send an 'ok' message with the answer to the peer.
@@ -208,7 +209,7 @@ async function handle_ok(answer) {
   // *** TODO ***: use setRemoteDescription (with await) to add the answer SDP 
   //               the peerConnection
 
-  peerConnection.setRemoteDescription(answer);
+  await peerConnection.setRemoteDescription(answer);
 }
 
 // ==========================================================================
@@ -221,8 +222,8 @@ async function handle_ok(answer) {
 async function handle_local_icecandidate(event) {
   console.log('Received local ICE candidate: ', event);
   // *** TODO ***: check if there is a new ICE candidate.
-  // *** TODO ***: if yes, send a 'ice_candidate' message with the candidate to the peer
   if (event.candidate) {
+    // *** TODO ***: if yes, send a 'ice_candidate' message with the candidate to the peer
     socket.emit('ice_candidate',event.candidate);
   }
 }
@@ -284,6 +285,7 @@ function handle_remote_datachannel(event) {
 // Handle Open event on dataChannel: show a message.
 // Received by the Caller and the Callee.
 function handle_datachannel_open(event) {
+  console.log(event);
   dataChannel.send('*** Channel is ready ***');
 }
 
