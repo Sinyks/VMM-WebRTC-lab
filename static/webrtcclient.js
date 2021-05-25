@@ -67,7 +67,7 @@ async function enable_camera() {
 function create_signaling_connection() {
   // *** TODO ***: create a socket by simply calling the io() function
   //               provided by the socket.io library (included in index.html).
-  var socket = io();
+  let socket = io();
   return socket;
 }
 
@@ -109,8 +109,7 @@ function add_signaling_handlers(socket) {
     handle_ok(answer);
   });
   // ice_candidate --> handle_remote_icecandidate
-  socket.on('ice_canditate',(candidate) => {
-    console.log("send remote ice candidate");
+  socket.on('ice_candidate',(candidate) => {
     handle_remote_icecandidate(candidate);
   });
   // bye --> hangUp
@@ -233,7 +232,7 @@ async function handle_local_icecandidate(event) {
 async function handle_remote_icecandidate(candidate) {
   console.log('Received remote ICE candidate: ', candidate);
   // *** TODO ***: add the received remote ICE candidate to the peerConnection
-  await peerConnection.addIceCandidate(candidate); 
+  peerConnection.addIceCandidate(candidate); 
 
 }
 
@@ -260,7 +259,7 @@ function create_datachannel(peerConnection) {
   console.log('Creating dataChannel. I am the Caller.');
 
   // *** TODO ***: create a dataChannel on the peerConnection
-  dataChannel = peerConnection.createDataChannel('chat');
+  dataChannel = peerConnection.createDataChannel("chat");
 
   // *** TODO ***: connect the handlers onopen and onmessage to the handlers below
   dataChannel.onopen = handle_datachannel_open;
@@ -285,7 +284,7 @@ function handle_remote_datachannel(event) {
 // Handle Open event on dataChannel: show a message.
 // Received by the Caller and the Callee.
 function handle_datachannel_open(event) {
-  console.log(event);
+  console.log("handle datachannel ",event);
   dataChannel.send('*** Channel is ready ***');
 }
 

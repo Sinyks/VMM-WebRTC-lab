@@ -67,11 +67,11 @@ def handle_p2pmessage(msg_type, content):
     # *** TODO ***: Get the room_name of the user from rooms_db
     room_name = rooms_db[user_id]
 
-    print(f"Received {msg_type} message: {content} from user: {user_id} in room {room_name}")
+    print(f"Received {msg_type} from user: {user_id} in room {room_name}")
 
     # *** TODO ***: Broadcast the message to existing client in the SocketIO room.
     #               Exclude the sender of the orignal message.
-    emit(msg_type,content,broadcast=True,include_self=False)
+    emit(msg_type, content, room=room_name, broadcast=True, include_self=False)
 
 # *** TODO ***: Create a message handler for 'invite' messages
 @socketio.on('invite')
@@ -98,7 +98,6 @@ def handle_bye(room_name):
     rooms_db.pop(user_id, None)
     # *** TODO ***: Forward the 'bye' message using p2p_message
     handle_p2pmessage('bye',room_name)
-    pass
 
 # ===========================================================================
 # Run server
